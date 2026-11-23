@@ -367,10 +367,18 @@ BEGIN
     IF NEW.status <> 'draft' THEN
       RAISE EXCEPTION 'Transactions must be created as draft';
     END IF;
+    IF (SELECT auth.uid()) IS NOT NULL AND NEW.created_by <> (SELECT auth.uid()) THEN
+      RAISE EXCEPTION 'created_by must match the authenticated actor';
+    END IF;
     RETURN NEW;
   ELSIF TG_OP = 'UPDATE' THEN
     IF OLD.status <> 'draft' THEN
       RAISE EXCEPTION 'Only draft transactions may be edited';
+    END IF;
+    IF NEW.created_by IS DISTINCT FROM OLD.created_by
+       OR NEW.household_id IS DISTINCT FROM OLD.household_id
+       OR NEW.id IS DISTINCT FROM OLD.id THEN
+      RAISE EXCEPTION 'Transaction identity and creator are immutable';
     END IF;
 
     IF NEW.status = 'posted' AND NOT EXISTS (
@@ -490,8 +498,11 @@ BEGIN
           v_total_debit, v_total_credit;
       END IF;
 
-      NEW.posted_at := COALESCE(NEW.posted_at, now());
-      NEW.posted_by := COALESCE((SELECT auth.uid()), NEW.posted_by);
+      NEW.posted_at := now();
+      NEW.posted_by := (SELECT auth.uid());
+    ELSIF NEW.status = 'draft' THEN
+      NEW.posted_at := NULL;
+      NEW.posted_by := NULL;
     ELSIF NEW.status <> 'draft' THEN
       RAISE EXCEPTION 'Invalid journal entry status transition';
     END IF;
@@ -500,6 +511,31 @@ BEGIN
   END IF;
 
   RETURN NULL;
+END;
+$function$;
+
+
+CREATE OR REPLACE FUNCTION private.guard_financial_account_identity()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = ''
+AS $function$
+BEGIN
+  IF NEW.id IS DISTINCT FROM OLD.id
+     OR NEW.household_id IS DISTINCT FROM OLD.household_id
+     OR NEW.ledger_account_id IS DISTINCT FROM OLD.ledger_account_id
+     OR NEW.created_by IS DISTINCT FROM OLD.created_by
+     OR NEW.opening_balance_amount IS DISTINCT FROM OLD.opening_balance_amount
+     OR NEW.opening_balance_at IS DISTINCT FROM OLD.opening_balance_at THEN
+    RAISE EXCEPTION 'Financial account identity and opening balance are immutable; use a ledger adjustment';
+  END IF;
+
+  IF OLD.opening_balance_transaction_id IS NOT NULL
+     AND NEW.opening_balance_transaction_id IS DISTINCT FROM OLD.opening_balance_transaction_id THEN
+    RAISE EXCEPTION 'Opening balance transaction link cannot be replaced';
+  END IF;
+
+  RETURN NEW;
 END;
 $function$;
 
@@ -588,6 +624,10 @@ CREATE TRIGGER profiles_set_updated_at
 BEFORE UPDATE ON public.profiles
 FOR EACH ROW EXECUTE FUNCTION private.set_updated_at();
 
+CREATE TRIGGER financial_accounts_guard_identity
+BEFORE UPDATE ON public.financial_accounts
+FOR EACH ROW EXECUTE FUNCTION private.guard_financial_account_identity();
+
 CREATE TRIGGER transactions_guard_lifecycle
 BEFORE INSERT OR UPDATE OR DELETE ON public.transactions
 FOR EACH ROW EXECUTE FUNCTION private.guard_transaction_lifecycle();
@@ -662,14 +702,29 @@ FOR ALL TO authenticated
 USING (private.is_household_member(household_id))
 WITH CHECK (private.is_household_member(household_id));
 
-CREATE POLICY financial_accounts_member_all
+CREATE POLICY financial_accounts_member_select
 ON public.financial_accounts
-FOR ALL TO authenticated
-USING (private.is_household_member(household_id))
+FOR SELECT TO authenticated
+USING (private.is_household_member(household_id));
+
+CREATE POLICY financial_accounts_member_insert
+ON public.financial_accounts
+FOR INSERT TO authenticated
 WITH CHECK (
   private.is_household_member(household_id)
   AND created_by = (SELECT auth.uid())
 );
+
+CREATE POLICY financial_accounts_member_update
+ON public.financial_accounts
+FOR UPDATE TO authenticated
+USING (private.is_household_member(household_id))
+WITH CHECK (private.is_household_member(household_id));
+
+CREATE POLICY financial_accounts_member_delete
+ON public.financial_accounts
+FOR DELETE TO authenticated
+USING (private.is_household_member(household_id));
 
 CREATE POLICY transactions_member_select
 ON public.transactions
@@ -821,18 +876,39 @@ REVOKE ALL ON TABLE
   public.journal_lines
 FROM PUBLIC, anon;
 
-GRANT SELECT, UPDATE ON TABLE public.households TO authenticated;
-GRANT SELECT, UPDATE ON TABLE public.profiles TO authenticated;
+GRANT SELECT ON TABLE public.households TO authenticated;
+REVOKE UPDATE ON TABLE public.households FROM authenticated;
+GRANT UPDATE (name, base_currency, timezone)
+  ON TABLE public.households TO authenticated;
+
+GRANT SELECT ON TABLE public.profiles TO authenticated;
+REVOKE UPDATE ON TABLE public.profiles FROM authenticated;
+GRANT UPDATE (display_name, avatar_path)
+  ON TABLE public.profiles TO authenticated;
+
 GRANT SELECT ON TABLE public.household_members TO authenticated;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
   public.ledger_accounts,
   public.transaction_categories,
   public.transactions,
-  public.financial_accounts,
   public.journal_entries,
   public.journal_lines
 TO authenticated;
+
+GRANT SELECT, INSERT, DELETE ON TABLE public.financial_accounts TO authenticated;
+REVOKE UPDATE ON TABLE public.financial_accounts FROM authenticated;
+GRANT UPDATE (
+  account_name,
+  account_type,
+  provider_name,
+  owner_attribution,
+  account_number_last4,
+  currency_code,
+  opening_balance_transaction_id,
+  is_active,
+  updated_at
+) ON TABLE public.financial_accounts TO authenticated;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
   public.households,
@@ -848,6 +924,7 @@ TO service_role;
 
 REVOKE ALL ON FUNCTION private.set_updated_at() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.guard_transaction_lifecycle() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.guard_financial_account_identity() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.guard_journal_entry() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.guard_journal_line() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.sync_transaction_after_journal_post() FROM PUBLIC, anon, authenticated;
