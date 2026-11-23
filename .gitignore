@@ -1,0 +1,30 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# Next.js
+/.next/
+/out/
+/build/
+
+# local environment
+.env
+.env.*
+!.env.example
+
+# deployment tooling
+.vercel
+.wrangler
+
+# testing and coverage
+/coverage
+/playwright-report
+/test-results
+
+# operating system / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

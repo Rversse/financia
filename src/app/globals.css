@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: #f5f6f8;
+  --foreground: #172235;
+  --card: #ffffff;
+  --card-foreground: #172235;
+  --primary: #14243a;
+  --primary-foreground: #ffffff;
+  --secondary: #e9edf2;
+  --secondary-foreground: #24354b;
+  --muted: #eef1f5;
+  --muted-foreground: #687587;
+  --border: #dce2e9;
+  --ring: #73849a;
+  --destructive: #b42318;
+}
+
+@theme inline {
+  --font-sans: Arial, Helvetica, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #dce5ef;
+  color: #14243a;
+}
