@@ -1,0 +1,3 @@
+-- FINANCIA seed file.
+-- No production household, Auth users, or personal financial data is seeded.
+-- Create the household and its two memberships only after the two invited Auth users exist.

@@ -45,7 +45,7 @@ Cloudflare Pages target settings:
 - Build command: `npm run build`
 - Build output directory: `out`
 
-The first deployment still requires Cloudflare Pages to be connected to this private GitHub repository. Deployment credentials must be configured as Cloudflare/GitHub secrets, never committed to this repository.
+The first deployment still requires Cloudflare Pages to be connected to this public GitHub repository. Deployment credentials must be configured as Cloudflare/GitHub secrets, never committed to this repository.
 
 ## Repository visibility
 
@@ -53,4 +53,4 @@ The repository is public. Do not commit personal financial data, credentials, da
 
 ## Project status
 
-Phase 1 — Project Discovery & Foundation is being established. Database schema, authentication policies, and financial modules are intentionally deferred to their dedicated phases.
+Phase 1 — Project Discovery & Foundation is complete. Phase 2 — Database & Authentication is in progress. The current database schema is tracked in `supabase/migrations/`; household user provisioning and Storage setup remain pending.

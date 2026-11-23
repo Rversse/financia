@@ -1,9 +1,9 @@
-# FINANCIA — Data Dictionary (Proposed)
+# FINANCIA — Data Dictionary
 
-**Batch 1 / Phase 2 — design artifact only**  
+**Phase 2 — implemented schema reference**  
 **Version:** 1.0 · **Date:** 2026-11-23
 
-This is the proposed catalog for the FINANCIA relational schema. All table definitions remain subject to migration-level SQL review. No table has been created in the live project by this document.
+This dictionary describes the FINANCIA relational schema created by the applied migrations. Treat migrations as the source of truth: update this dictionary whenever a new migration changes a table, constraint, index, or lifecycle rule. Current live-state and pending work are recorded in `implementation-status.md`.
 
 ## 1. Global conventions
 

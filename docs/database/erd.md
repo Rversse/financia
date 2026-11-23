@@ -1,9 +1,9 @@
 # FINANCIA — ERD Baseline
 
-**Batch 1 / Phase 2 — design artifact only**  
+**Phase 2 — implemented schema reference**  
 **Version:** 1.0 · **Date:** 2026-11-23
 
-This ERD describes the proposed relational model for one private household, two equal users, IDR-first accounting, and a gold-distribution business. It is a design baseline; it has not been applied to Supabase.
+This ERD documents the implemented relational baseline for one private household, two equal users, IDR-first accounting, and the gold-distribution business. The four schema batches listed in `implementation-status.md` are applied to Supabase. Household/user provisioning and private receipt Storage remain pending.
 
 ## 1. Entity relationship diagram
 

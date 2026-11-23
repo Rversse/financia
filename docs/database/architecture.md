@@ -1,12 +1,12 @@
 # FINANCIA Database Architecture — Phase 2
 
-**Status:** Discovery and architecture baseline  
+**Status:** Architecture baseline implemented; see `implementation-status.md` for verified live state  
 **Reviewed:** 2026-11-23  
 **Supabase project:** `financia` (`tjutcenodmowkfviwrpd`)  
 **PostgreSQL:** 17.12  
 **Region:** `ap-southeast-1` (Singapore)
 
-This document records the current database audit and the architectural direction for the next database-design steps. It is not a migration and does not change the live schema.
+This document records the architecture and the live database baseline. Schema changes are applied through versioned SQL migrations; this document itself does not change the live schema.
 
 ## 1. Current database audit
 
