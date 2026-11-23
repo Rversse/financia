@@ -27,6 +27,7 @@ Before inviting anyone, verify the hosted project's Auth settings:
 4. Use a production-ready SMTP sender for invitation and password-reset mail if required by the project's email delivery setup.
 5. Configure the Site URL to the deployed FINANCIA origin when it exists.
 6. Add exact redirect URLs:
+   - `http://localhost:3000` for the Site URL fallback; the landing page forwards auth payloads to the callback.
    - `http://localhost:3000/auth/callback` for local development.
    - `https://<production-host>/auth/callback` after Cloudflare Pages deployment.
 
@@ -42,6 +43,8 @@ The intended identities are:
 Use the Supabase Auth administrative invite flow to invite only these two people. They set their own passwords through the emailed invitation. Do not share or store either person's password in chat or GitHub.
 
 The currently connected Supabase tools do not expose an Auth admin invitation operation or a hosted Auth settings update operation. The invite action and hosted signup toggle must therefore be completed in the Supabase Dashboard unless a suitable Auth admin connector is added.
+
+The landing page forwards invitation payloads received at the Site URL root to `/auth/callback`, including Supabase hash-fragment tokens. The callback handles PKCE codes, token hashes, and existing browser sessions from implicit-flow fragments.
 
 After both invitations are accepted, record each user's Auth UUID from the Users view. The client application must never create household membership rows.
 
