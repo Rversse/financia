@@ -158,7 +158,17 @@ The ERD and data dictionary will refine the exact table names and relationships.
 
 These are conceptual domains, not a commitment to create one table for every listed noun. Avoid duplicating values that can be derived safely from the ledger.
 
-## 6. Next steps — not yet applied
+## 6. Design artifacts
+
+The detailed Phase 2 design batch is maintained in separate reviewed documents:
+
+- [Entity Relationship Diagram](./erd.md)
+- [Data Dictionary](./data-dictionary.md)
+- [Accounting Scenario Validation](./scenario-validation.md)
+
+These artifacts define the table-level proposal, data types, constraints, relationships, and acceptance examples. They do not represent live database changes.
+
+## 7. Next steps — not yet applied
 
 1. Produce a full ERD and a data dictionary with table keys, ownership, types, checks, foreign keys, unique constraints, indexes, and lifecycle rules.
 2. Review the ERD against real examples for transfers, household spending, income allocation, asset purchase/sale, liability payment, and gold distribution business operations.
