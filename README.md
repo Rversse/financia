@@ -47,6 +47,10 @@ Cloudflare Pages target settings:
 
 The first deployment still requires Cloudflare Pages to be connected to this private GitHub repository. Deployment credentials must be configured as Cloudflare/GitHub secrets, never committed to this repository.
 
+## Repository visibility
+
+The repository is public. Do not commit personal financial data, credentials, database passwords, service-role keys, private keys, or production environment files.
+
 ## Project status
 
 Phase 1 — Project Discovery & Foundation is being established. Database schema, authentication policies, and financial modules are intentionally deferred to their dedicated phases.
