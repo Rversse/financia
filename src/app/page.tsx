@@ -1,6 +1,5 @@
+import Link from "next/link";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 
 const workspaceDetails = [
   { label: "Pengguna", value: "Suami & istri" },
@@ -59,10 +58,13 @@ export default function Home() {
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Button size="lg" disabled>
-                Fondasi aplikasi disiapkan
-                <ArrowUpRight aria-hidden="true" />
-              </Button>
+              <Link
+                href="/login"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              >
+                Masuk ke FINANCIA
+                <ArrowUpRight aria-hidden="true" className="size-4" />
+              </Link>
               <span className="text-xs text-muted-foreground">
                 Workspace pribadi untuk dua pengguna
               </span>
