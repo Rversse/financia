@@ -47,6 +47,12 @@ The unused-index notices are expected while all application tables are empty. Do
 - The `receipts` table references the intended private bucket name `financia-private`, but that bucket does not exist yet. Receipt upload is not ready and must wait for the Smart Capture / Storage batch.
 - No service-role key, database password, or secret belongs in this public repository.
 
+## Authentication application status
+
+The repository now includes the typed Supabase browser client, invite-only sign-in UI, PKCE/token callback, protected dashboard route, and password reset flow. The client contains no public signup operation.
+
+See [Authentication Runbook](../authentication-runbook.md) for hosted Auth settings, invite flow, household provisioning, and acceptance tests.
+
 ## Remaining Phase 2 work
 
 1. Verify hosted Auth settings: disable self-service signup, retain email/password for invited users, and configure the production Site URL / exact redirect URLs after the app URL exists.

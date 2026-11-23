@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [resetPending, setResetPending] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,6 +38,40 @@ export default function LoginPage() {
           : "Email atau password tidak dapat diverifikasi."
       );
       setPending(false);
+    }
+  }
+
+  async function handlePasswordReset() {
+    if (!email.trim()) {
+      setError("Masukkan alamat email terlebih dahulu.");
+      return;
+    }
+
+    setResetPending(true);
+    setError(null);
+    setResetMessage(null);
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        { redirectTo: `${siteUrl}/auth/callback` }
+      );
+
+      if (resetError) throw resetError;
+
+      setResetMessage(
+        "Jika alamat tersebut terdaftar, instruksi pemulihan akan dikirim melalui email."
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Permintaan pemulihan password tidak dapat diproses."
+      );
+    } finally {
+      setResetPending(false);
     }
   }
 
@@ -121,6 +157,23 @@ export default function LoginPage() {
                 placeholder="Masukkan password"
               />
             </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                disabled={resetPending}
+                className="text-xs font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
+              >
+                {resetPending ? "Mengirim…" : "Lupa password?"}
+              </button>
+            </div>
+
+            {resetMessage && (
+              <p role="status" className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+                {resetMessage}
+              </p>
+            )}
 
             {error && (
               <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">

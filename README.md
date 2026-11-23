@@ -16,6 +16,7 @@ FINANCIA is a private household finance workspace for two users: husband and wif
 
 - **Web:** Next.js App Router, React, TypeScript, Tailwind CSS, and shadcn/ui.
 - **Backend:** Supabase PostgreSQL, Auth, Storage, and Edge Functions.
+- **Client integration:** typed `@supabase/supabase-js` browser client with PKCE sign-in and invite-only routes.
 - **Hosting target:** Cloudflare Pages using Next.js static export.
 - **PWA:** Web manifest and a conservative service worker that caches only same-origin static assets and a generic offline page.
 - **Timezone/currency:** `Asia/Jakarta` / `IDR`.

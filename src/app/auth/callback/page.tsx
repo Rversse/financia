@@ -48,8 +48,13 @@ export default function AuthCallbackPage() {
         }
 
         if (active) {
-          setMessage("Autentikasi berhasil. Membuka workspace…");
-          router.replace("/dashboard");
+          if (type === "recovery") {
+            setMessage("Identitas terverifikasi. Membuka pengaturan password…");
+            router.replace("/reset-password");
+          } else {
+            setMessage("Autentikasi berhasil. Membuka workspace…");
+            router.replace("/dashboard");
+          }
         }
       } catch (cause) {
         if (!active) return;

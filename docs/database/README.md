@@ -9,6 +9,7 @@ Phase 2 database architecture, migrations, and security reference for the privat
 3. [Data Dictionary](./data-dictionary.md)
 4. [Accounting scenario validation](./scenario-validation.md)
 5. [Live implementation status](./implementation-status.md)
+6. [Authentication runbook](../authentication-runbook.md)
 
 ## Live status — 23 November 2026
 
@@ -20,6 +21,9 @@ Phase 2 database architecture, migrations, and security reference for the privat
 - [x] Explicit grants; no application table grants to `anon`
 - [x] RLS helper and event-trigger function execution restricted
 - [x] Supabase Security Advisor returns no findings
+- [x] Typed Supabase browser client and invite-only sign-in UI
+- [x] PKCE callback and password recovery routes
+- [ ] Hosted Auth signup disabled and redirect URLs configured
 - [ ] Two Auth users invited and confirmed
 - [ ] One household and two active memberships provisioned
 - [ ] Live two-user RLS isolation and write-path tests
