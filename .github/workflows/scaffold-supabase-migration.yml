@@ -35,9 +35,15 @@ jobs:
       - name: Initialize Supabase CLI project and create migration
         shell: bash
         env:
-          REQUESTED_NAME: ${{ github.event.inputs.migration_name || 'phase2_household_ledger_foundation' }}
+          REQUESTED_NAME: ${{ github.event.inputs.migration_name || '' }}
         run: |
           set -euo pipefail
+          if [ -f .migration-request ]; then
+            REQUESTED_NAME="$(tr -d '[:space:]' < .migration-request)"
+          fi
+          if [ -z "$REQUESTED_NAME" ]; then
+            REQUESTED_NAME="manual_migration"
+          fi
           if [[ ! "$REQUESTED_NAME" =~ ^[a-z][a-z0-9_]{2,60}$ ]]; then
             echo "Migration name must be snake_case and start with a letter."
             exit 1
