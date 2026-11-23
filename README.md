@@ -28,7 +28,7 @@ Requirements: Node.js 22 LTS and npm.
 
 1. Copy `.env.example` to `.env.local`.
 2. Fill in the Supabase project URL and publishable key when the Supabase client is introduced.
-3. Install dependencies with `npm install`.
+3. Install the pinned dependencies with `npm ci` (the lockfile is committed).
 4. Run `npm run dev`.
 5. Run validation with `npm run check`.
 
