@@ -440,6 +440,8 @@ BEGIN
     IF NEW.status <> 'draft' THEN
       RAISE EXCEPTION 'Journal entries must be created as draft';
     END IF;
+    NEW.posted_at := NULL;
+    NEW.posted_by := NULL;
 
     IF NOT EXISTS (
       SELECT 1
@@ -627,6 +629,10 @@ FOR EACH ROW EXECUTE FUNCTION private.set_updated_at();
 CREATE TRIGGER financial_accounts_guard_identity
 BEFORE UPDATE ON public.financial_accounts
 FOR EACH ROW EXECUTE FUNCTION private.guard_financial_account_identity();
+
+CREATE TRIGGER financial_accounts_set_updated_at
+BEFORE UPDATE ON public.financial_accounts
+FOR EACH ROW EXECUTE FUNCTION private.set_updated_at();
 
 CREATE TRIGGER transactions_guard_lifecycle
 BEFORE INSERT OR UPDATE OR DELETE ON public.transactions
@@ -906,8 +912,7 @@ GRANT UPDATE (
   account_number_last4,
   currency_code,
   opening_balance_transaction_id,
-  is_active,
-  updated_at
+  is_active
 ) ON TABLE public.financial_accounts TO authenticated;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
