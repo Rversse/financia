@@ -12,8 +12,9 @@ export function AuthGuard({ children }: Readonly<{ children: React.ReactNode }>)
 
   useEffect(() => {
     let active = true;
+    let unsubscribe: (() => void) | undefined;
 
-    try {
+    void (async () => {
       const supabase = getSupabaseBrowserClient();
       const {
         data: { subscription }
@@ -24,34 +25,31 @@ export function AuthGuard({ children }: Readonly<{ children: React.ReactNode }>)
         }
       });
 
-      void supabase.auth.getUser().then(({ data, error }) => {
-        if (!active) return;
+      unsubscribe = () => subscription.unsubscribe();
 
-        if (error || !data.user) {
-          router.replace("/login");
-          return;
-        }
+      const { data, error } = await supabase.auth.getUser();
 
-        setReady(true);
-      }).catch((error: unknown) => {
-        if (!active) return;
-        setConfigurationError(
-          error instanceof Error ? error.message : "Autentikasi tidak dapat diverifikasi."
-        );
-      });
+      if (!active) return;
 
-      return () => {
-        active = false;
-        subscription.unsubscribe();
-      };
-    } catch (error) {
+      if (error || !data.user) {
+        router.replace("/login");
+        return;
+      }
+
+      setReady(true);
+    })().catch((error: unknown) => {
+      if (!active) return;
       setConfigurationError(
-        error instanceof Error ? error.message : "Konfigurasi Supabase belum tersedia."
+        error instanceof Error
+          ? error.message
+          : "Konfigurasi autentikasi belum tersedia."
       );
-      return () => {
-        active = false;
-      };
-    }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, [router]);
 
   if (configurationError) {
