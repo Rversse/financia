@@ -25,24 +25,15 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
 
-      - name: Check lockfile status
-        id: lockfile
-        shell: bash
-        run: |
-          if [ -f package-lock.json ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-          fi
+      # Keep package-lock.json synchronized when package.json changes.
+      - name: Install dependencies and update lockfile
+        run: npm install --no-audit --no-fund
 
-      - name: Install dependencies
-        run: |
-          if [ "${{ steps.lockfile.outputs.present }}" = "true" ]; then
-            npm ci --no-audit --no-fund
-          else
-            npm install --no-audit --no-fund
-          fi
+      # Verify that the resulting lockfile supports a clean reproducible install.
+      - name: Verify clean dependency install
+        run: npm ci --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
@@ -53,16 +44,16 @@ jobs:
       - name: Build static export
         run: npm run build
 
-      - name: Commit generated npm lockfile
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.lockfile.outputs.present == 'false'
+      - name: Commit updated npm lockfile
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add package-lock.json
           if git diff --cached --quiet; then
-            echo "No package-lock changes to commit."
+            echo "No package-lock changes."
             exit 0
           fi
-          git commit -m "chore: add npm lockfile"
+          git commit -m "chore: update npm lockfile"
           git push origin HEAD:main
